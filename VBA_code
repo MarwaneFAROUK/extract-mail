@@ -1,0 +1,55 @@
+Sub extract_outlook_data()
+
+    On Error GoTo ErrHandler
+    Dim str As String
+    ' Set Outlook application object.
+    Dim objOutlook As Object
+    Set objOutlook = CreateObject("Outlook.Application")
+    
+    Dim objNSpace As Object     .
+    Set objNSpace = objOutlook.GetNamespace("MAPI")
+    
+    Dim myFolder As Object  ' Create a folder object.
+    Set myFolder = objNSpace.GetDefaultFolder(olFolderInbox)
+    
+    Dim objItem As Object
+    Dim iRows, iCols As Integer
+    iRows = 2
+
+    ' Loop through each item in the folder.
+    For Each objItem In myFolder.Items
+        If objItem.Class = olMail Then
+        
+            Dim objMail As Outlook.MailItem
+            Set objMail = objItem
+            'If objMail.Sender = "XXX" Then  'put the sender name instead of XXX (this loop if you want to filter mails by sender)
+               Cells(iRows, 1) = objMail.Sender
+               str = objMail.body
+               'MsgBox str
+               Cells(iRows, 2) = objMail.To
+               Cells(iRows, 3) = objMail.Subject
+               Cells(iRows, 4) = objMail.To
+               Cells(iRows, 5) = objMail.body
+               iRows = iRows + 1
+            'End If
+        End If
+        
+    Next
+    
+    Set objMail = Nothing
+   
+    Set objOutlook = Nothing
+    Set objNSpace = Nothing
+    Set myFolder = Nothing
+ErrHandler:
+    Debug.Print Err.Description
+    Dim fso As Object
+    
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Dim TextFile As Object
+    
+    Set TextFile = fso.CreateTextFile("C:\Downloads\testtext.txt") 'put file path
+    TextFile.Write str
+
+End Sub
